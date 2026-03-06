@@ -1,0 +1,31 @@
+Implement a UART transmitter with parity support.
+
+Inputs
+
+* clk : system clock
+* rst : synchronous reset
+* tx_start : start transmission
+* data_in[7:0] : data to transmit
+* baud_div[15:0] : baud rate divider
+* parity_en : enable parity
+* parity_type : 0 = even parity, 1 = odd parity
+
+Outputs
+
+* tx : serial output line
+* busy : high while transmission is in progress
+
+Frame format:
+Start bit : 0
+Data bits : 8 bits (LSB first)
+Parity bit : optional (depending on parity_en)
+Stop bit : 1
+
+Behavior:
+
+1. Transmission starts when tx_start is asserted while idle.
+2. busy must remain high until the stop bit completes.
+3. If parity_en is enabled, a parity bit must be transmitted after the data bits.
+4. Even parity means total number of 1s including parity bit is even.
+5. Odd parity means total number of 1s including parity bit is odd.
+
