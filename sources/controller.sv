@@ -43,14 +43,14 @@ always_ff @(posedge clk) begin
 
             if(tx_start) begin
                 shift_reg <= data_in;
-                parity_bit <= ^data_in;  
+                parity_bit <= (^data_in);  
 
-                if(parity_type)
+		if(parity_type) 
                     parity_bit <= ~(^data_in);
-
                 state <= START;
                 busy <= 1;
                 baud_cnt <= 0;
+	       	
             end
         end
 
