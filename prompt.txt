@@ -1,0 +1,1 @@
+Complete the implementation in sources/controller.sv to detect Read-After-Write (RAW) hazards. The module should assert 'stall' and 'flush_exec' if the instruction in the Decode stage requires a register that the Execute stage is currently writing to.
