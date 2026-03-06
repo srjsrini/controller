@@ -1,0 +1,49 @@
+Complete the implementation in `sources/uart_tx.sv`.
+
+Design a UART transmitter with optional parity support.
+
+Module Interface
+
+Inputs
+
+* clk : system clock
+* rst : synchronous reset
+* tx_start : start transmission when asserted for one clock cycle
+* data_in[7:0] : data byte to transmit
+* baud_div[15:0] : clock divider controlling baud rate
+* parity_en : enable parity transmission
+* parity_type : parity selection (0 = even parity, 1 = odd parity)
+
+Outputs
+
+* tx : serial transmit line
+* busy : high while transmission is in progress
+
+Frame Format
+
+The UART frame must be transmitted in the following order:
+
+1. Start bit (logic 0)
+2. 8 data bits (LSB first)
+3. Optional parity bit (if parity_en is asserted)
+4. Stop bit (logic 1)
+
+Functional Requirements
+
+1. Transmission begins when `tx_start` is asserted while the transmitter is idle.
+2. `busy` must remain high until the entire frame is transmitted.
+3. The transmitter must shift out the data bits LSB first.
+4. If parity is enabled:
+
+   * Even parity: total number of 1s including parity bit must be even
+   * Odd parity: total number of 1s including parity bit must be odd
+5. The baud divider determines how many clock cycles each bit lasts.
+
+Implementation Notes
+
+* Use a finite state machine to control transmission.
+* Ensure counters reset correctly between states.
+* The `tx` line must remain high when idle.
+
+Only modify the implementation inside `sources/uart_tx.sv`.
+
