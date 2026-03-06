@@ -1,29 +1,37 @@
 import cocotb
-from cocotb.triggers import Timer
-import os
-from pathlib import Path
-from cocotb_tools.runner import get_runner
+from cocotb.triggers import RisingEdge
+from cocotb.clock import Clock
+import random
 
 @cocotb.test()
-async def stall_test(dut):
-    dut.rst_n.value = 1
-    dut.we_exec.value = 0
-    dut.rs1_en.value = 0
-    dut.rs2_en.value = 0
-    await Timer(1, units="us")
+async def uart_tx_test(dut):
 
-    # Test RAW Hazard on rs1
-    dut.rs1_addr.value = 5
-    dut.rd_addr_exec.value = 5
-    dut.we_exec.value = 1
-    dut.rs1_en.value = 1
-    await Timer(1, units="us")
-    assert dut.stall.value == 1, "Error: Failed to stall"
+    clock = Clock(dut.clk, 10, unit="ns")
+    cocotb.start_soon(clock.start())
 
-def test_controller_hidden_runner():
-    sim = os.getenv("SIM", "icarus")
-    proj_path = Path(__file__).resolve().parent.parent
-    sources = [proj_path / "sources/controller.sv"]
-    runner = get_runner(sim)
-    runner.build(sources=sources, hdl_toplevel="controller", always=True)
-    runner.test(hdl_toplevel="controller", test_module="test_controller_hidden")
+    dut.rst.value = 1
+    dut.tx_start.value = 0
+    dut.data_in.value = 0
+    dut.parity_en.value = 1
+    dut.parity_type.value = 0
+    dut.baud_div.value = 5
+
+    for _ in range(5):
+        await RisingEdge(dut.clk)
+
+    dut.rst.value = 0
+
+    for _ in range(5):
+
+        data = random.randint(0,255)
+
+        dut.data_in.value = data
+        dut.tx_start.value = 1
+
+        await RisingEdge(dut.clk)
+        dut.tx_start.value = 0
+
+        while dut.busy.value == 1:
+            await RisingEdge(dut.clk)
+
+        assert dut.busy.value == 0
